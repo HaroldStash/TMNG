@@ -1,0 +1,228 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             xmlns:c="using:Tmng.App.Controls"
+             x:Class="Tmng.App.Views.PerformanceView"
+             x:DataType="vm:PerformanceViewModel">
+
+  <!-- Device-specific graph areas; the shared header and stats are in the detail template below. -->
+  <UserControl.DataTemplates>
+    <DataTemplate DataType="vm:CpuDevice">
+      <ItemsControl ItemsSource="{Binding Cells}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid Columns="{Binding $parent[ItemsControl].((vm:CpuDevice)DataContext).Columns}" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:LogicalCell">
+            <Border Margin="2" Padding="6,3" Height="86" CornerRadius="4" BorderThickness="1" BorderBrush="{Binding Ink.Border}">
+              <DockPanel>
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,3">
+                  <TextBlock Text="{Binding Label}" FontSize="11" Foreground="{Binding Ink.Brush}" />
+                  <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="11" Classes="mono" />
+                </Grid>
+                <c:TraceGraph Lines="{Binding Lines}"
+                              Generation="{Binding $parent[ItemsControl].((vm:CpuDevice)DataContext).Generation}" />
+              </DockPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:MemoryDevice">
+      <Grid RowDefinitions="Auto,280">
+        <TextBlock Text="{Binding TopLabel}" Classes="caption" HorizontalAlignment="Right" />
+        <c:TraceGraph Grid.Row="1" Lines="{Binding Lines}" Generation="{Binding Generation}" />
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:AdapterDevice">
+      <StackPanel Spacing="8">
+        <ItemsControl ItemsSource="{Binding Engines}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid Columns="2" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:EngineGraph">
+              <DockPanel Margin="3" Height="140">
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,3">
+                  <TextBlock Text="{Binding Name}" Classes="caption" />
+                  <TextBlock Grid.Column="1" Text="{Binding Value}" Classes="mono" FontSize="12" />
+                </Grid>
+                <c:TraceGraph Lines="{Binding Lines}"
+                              Generation="{Binding $parent[ItemsControl].((vm:AdapterDevice)DataContext).Generation}" />
+              </DockPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Text="{Binding MemoryCaption}" Classes="caption" />
+        <c:TraceGraph Lines="{Binding MemoryLines}" Generation="{Binding Generation}" Height="96" />
+      </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:DiskDevice">
+      <StackPanel Spacing="8">
+        <c:TraceGraph Lines="{Binding ActiveLines}" Generation="{Binding Generation}" Height="200" />
+        <TextBlock Text="{Binding TransferCaption}" Classes="caption" />
+        <c:TraceGraph Lines="{Binding TransferLines}" Generation="{Binding Generation}" Height="120" />
+      </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:NetworkDevice">
+      <c:TraceGraph Lines="{Binding Lines}" Generation="{Binding Generation}" Height="280" />
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:EnergyDevice">
+      <StackPanel Spacing="12">
+        <c:TraceGraph Lines="{Binding Lines}" Generation="{Binding Generation}" Height="200" />
+        <UniformGrid Columns="3">
+          <Border Classes="card" Margin="0,0,6,0">
+            <StackPanel><TextBlock Text="Power plan" Classes="caption" /><TextBlock Text="{Binding PlanText}" Classes="cardValue" /></StackPanel>
+          </Border>
+          <Border Classes="card" Margin="3,0">
+            <StackPanel><TextBlock Text="Power source" Classes="caption" /><TextBlock Text="{Binding SourceText}" Classes="cardValue" /></StackPanel>
+          </Border>
+          <Border Classes="card" Margin="6,0,0,0">
+            <StackPanel><TextBlock Text="Battery" Classes="caption" /><TextBlock Text="{Binding BatteryText}" Classes="cardValue" /></StackPanel>
+          </Border>
+        </UniformGrid>
+        <TextBlock Text="Processes with the highest estimated energy demand" Classes="title" />
+        <ItemsControl ItemsSource="{Binding TopProcesses}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:EnergyRow">
+              <Grid ColumnDefinitions="2*,3*,90" ColumnSpacing="12" Margin="0,4">
+                <TextBlock Text="{Binding Name}" FontSize="14" TextTrimming="CharacterEllipsis" />
+                <ProgressBar Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding Share}" VerticalAlignment="Center"
+                             Foreground="{Binding $parent[ItemsControl].((vm:EnergyDevice)DataContext).Ink.Brush}" />
+                <TextBlock Grid.Column="2" Text="{Binding Watts}" Classes="mono" HorizontalAlignment="Right" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Text="{Binding EstimateNote}" Classes="caption" TextWrapping="Wrap" />
+      </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="vm:ThermalDevice">
+      <StackPanel Spacing="12">
+        <c:TraceGraph Lines="{Binding Lines}" Generation="{Binding Generation}" Height="200" />
+        <UniformGrid Columns="2">
+          <Border Classes="card" Margin="0,0,6,0">
+            <StackPanel><TextBlock Text="Hottest sensor" Classes="caption" /><TextBlock Text="{Binding HotspotText}" Classes="cardValue" /></StackPanel>
+          </Border>
+          <Border Classes="card" Margin="6,0,0,0">
+            <StackPanel><TextBlock Text="CPU performance limit" Classes="caption" /><TextBlock Text="{Binding LimitText}" Classes="cardValue" /></StackPanel>
+          </Border>
+        </UniformGrid>
+        <TextBlock Text="Temperature sensors" Classes="title" />
+        <TextBlock Text="{Binding SensorNote}" Classes="caption" TextWrapping="Wrap"
+                   IsVisible="{Binding SensorNote, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <ItemsControl ItemsSource="{Binding Sensors}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid Columns="2" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:SensorCell">
+              <Border Classes="card" Margin="4" Height="120">
+                <DockPanel>
+                  <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                    <TextBlock Text="{Binding Label}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="1" Text="{Binding Value}" Classes="mono" Foreground="{DynamicResource ThermalText}" />
+                  </Grid>
+                  <c:TraceGraph Lines="{Binding Lines}"
+                                Generation="{Binding $parent[ItemsControl].((vm:ThermalDevice)DataContext).Generation}" />
+                </DockPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <Grid ColumnDefinitions="340,*" ColumnSpacing="14">
+    <!-- Device list -->
+    <ListBox Classes="devices" ItemsSource="{Binding DevicesList}" SelectedItem="{Binding Selected}">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:DeviceViewModel">
+          <Grid ColumnDefinitions="Auto,*,112" ColumnSpacing="12">
+            <TextBlock Classes="glyph" Text="{Binding Glyph}" FontSize="20" Foreground="{Binding Ink.Brush}" VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+              <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Light" LetterSpacing="1" TextTrimming="CharacterEllipsis" />
+              <TextBlock Text="{Binding Line1}" Classes="caption" TextTrimming="CharacterEllipsis" />
+              <TextBlock Text="{Binding Line2}" Classes="caption" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+            <Border Grid.Column="2" Height="66" CornerRadius="3" BorderThickness="1" BorderBrush="{Binding Ink.Border}" ClipToBounds="True">
+              <c:TraceGraph Lines="{Binding TileLines}" Generation="{Binding Generation}" />
+            </Border>
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
+    <!-- Detail pane for the selected device -->
+    <ScrollViewer Grid.Column="1">
+      <ContentControl Content="{Binding Selected}" Margin="0,0,14,0">
+        <ContentControl.ContentTemplate>
+          <DataTemplate x:DataType="vm:DeviceViewModel">
+            <StackPanel Spacing="6">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{Binding Title}" FontSize="30" FontWeight="Light" LetterSpacing="2" />
+                <TextBlock Text="{Binding Subtitle}" Classes="caption" FontSize="14" />
+              </StackPanel>
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="18">
+                <c:VfdMeter Orientation="Horizontal" Segments="36" Height="24" VerticalAlignment="Center"
+                            Value="{Binding Meter}" Accent="{Binding Ink.Accent}"
+                            GradientMid="{Binding GradientMid}" GradientEnd="{Binding GradientEnd}" />
+                <TextBlock Grid.Column="1" Text="{Binding ValueText}" Classes="value" FontSize="30" Foreground="{Binding Ink.Brush}" />
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding GraphCaption}" Classes="caption" />
+                <TextBlock Grid.Column="1" Text="Scrolling history · 5 minutes" Classes="caption" />
+              </Grid>
+              <ContentControl Content="{Binding}" />
+
+              <ItemsControl ItemsSource="{Binding Stats}" Margin="0,4,0,0">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <UniformGrid Columns="4" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:KeyValue">
+                    <StackPanel Margin="0,0,12,6">
+                      <TextBlock Text="{Binding Key}" Classes="caption" />
+                      <TextBlock Text="{Binding Value}" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <ItemsControl ItemsSource="{Binding Specs}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <UniformGrid Columns="2" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:KeyValue">
+                    <Grid ColumnDefinitions="170,*" Margin="0,1,16,1">
+                      <TextBlock Text="{Binding Key, StringFormat='{}{0}:'}" Classes="caption" FontSize="13" />
+                      <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="13" TextWrapping="Wrap" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </DataTemplate>
+        </ContentControl.ContentTemplate>
+      </ContentControl>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

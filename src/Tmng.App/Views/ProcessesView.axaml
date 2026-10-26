@@ -1,0 +1,151 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             x:Class="Tmng.App.Views.ProcessesView"
+             x:DataType="vm:ProcessesViewModel">
+  <UserControl.Styles>
+    <!-- Flat disclosure chevron: the Fluent toggle's checked and hover fills would read as a selected button. -->
+    <Style Selector="ToggleButton.disclosure">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="Width" Value="18" />
+      <Setter Property="Height" Value="18" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ToggleButton.disclosure /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ToggleButton.disclosure:checked /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ToggleButton.disclosure:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ToggleButton.disclosure:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ToggleButton.disclosure TextBlock.glyph">
+      <Setter Property="FontSize" Value="10" />
+      <Setter Property="Foreground" Value="{DynamicResource TextCaption}" />
+      <Setter Property="RenderTransform" Value="rotate(0deg)" />
+    </Style>
+    <Style Selector="ToggleButton.disclosure:checked TextBlock.glyph">
+      <Setter Property="RenderTransform" Value="rotate(90deg)" />
+    </Style>
+    <Style Selector="ToggleButton.disclosure:pointerover TextBlock.glyph">
+      <Setter Property="Foreground" Value="{DynamicResource TextBody}" />
+    </Style>
+  </UserControl.Styles>
+
+  <UserControl.DataTemplates>
+    <DataTemplate DataType="vm:ProcessGroupRow">
+      <StackPanel Orientation="Horizontal" Spacing="6" Margin="4,0,0,0" VerticalAlignment="Center">
+        <Panel Width="18">
+          <ToggleButton Classes="disclosure" IsVisible="{Binding IsExpandable}" IsChecked="{Binding IsExpanded}">
+            <TextBlock Classes="glyph" Text="&#xE76C;" />
+          </ToggleButton>
+        </Panel>
+        <Image Source="{Binding Icon}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
+        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+        <TextBlock Text="{Binding CountText}" Classes="caption" VerticalAlignment="Center" />
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="vm:ProcessRow">
+      <StackPanel Orientation="Horizontal" Spacing="6" Margin="4,0,0,0" VerticalAlignment="Center">
+        <Panel Width="18" />
+        <Panel Width="{Binding Indent}" />
+        <Image Source="{Binding Icon}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
+        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ExeName}" />
+      </StackPanel>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="14">
+      <TextBox Text="{Binding Filter}" PlaceholderText="Filter by name, user, or PID" />
+      <ComboBox Grid.Column="1" ItemsSource="{Binding RefreshRates}" SelectedItem="{Binding Refresh}" MinWidth="120"
+                VerticalAlignment="Center" ToolTip.Tip="How often the list updates" />
+      <Button Grid.Column="2" Content="{Binding PauseLabel}" Command="{Binding TogglePauseCommand}" MinWidth="80"
+              VerticalAlignment="Center" ToolTip.Tip="Freeze the list to read it; sampling continues in the background" />
+      <TextBlock Grid.Column="3" Text="{Binding CountText}" Classes="caption" VerticalAlignment="Center" />
+    </Grid>
+
+    <Border Grid.Row="1" Classes="panel" Padding="0">
+      <DataGrid ItemsSource="{Binding View}" SelectedItem="{Binding Selected}" Sorting="OnSorting"
+                IsReadOnly="True" CanUserSortColumns="True" CanUserResizeColumns="True"
+                GridLinesVisibility="None" HeadersVisibility="Column">
+        <DataGrid.Columns>
+          <DataGridTemplateColumn x:DataType="vm:ProcessListRow" Header="Name" SortMemberPath="Name" Width="2*">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="vm:ProcessListRow">
+                <ContentControl Content="{Binding}" />
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTextColumn x:DataType="vm:ProcessListRow" Header="PID" Binding="{Binding Pid}" SortMemberPath="Pid" Width="80" />
+          <DataGridTextColumn x:DataType="vm:ProcessListRow" Header="User" Binding="{Binding User}" SortMemberPath="User" Width="130" />
+          <DataGridTextColumn x:DataType="vm:ProcessListRow" Header="CPU" Binding="{Binding CpuText}" SortMemberPath="CpuValue" Width="80" />
+          <DataGridTextColumn x:DataType="vm:ProcessListRow" Header="Memory" Binding="{Binding MemoryText}" SortMemberPath="MemoryValue" Width="110" />
+          <DataGridTextColumn x:DataType="vm:ProcessListRow" Header="GPU" Binding="{Binding GpuText}" SortMemberPath="GpuValue" Width="70" />
+          <DataGridTextColumn x:DataType="vm:ProcessListRow" Header="NPU" Binding="{Binding NpuText}" SortMemberPath="NpuValue" Width="70" />
+          <DataGridTextColumn x:DataType="vm:ProcessListRow" Header="Disk" Binding="{Binding DiskText}" SortMemberPath="DiskValue" Width="100" />
+          <DataGridTextColumn x:DataType="vm:ProcessListRow" Header="Network" Binding="{Binding NetworkText}" SortMemberPath="NetworkValue" Width="100" />
+          <DataGridTextColumn x:DataType="vm:ProcessListRow" Header="All I/O" Binding="{Binding IoText}" SortMemberPath="IoValue" Width="100" />
+          <DataGridTextColumn x:DataType="vm:ProcessListRow" Header="Threads" Binding="{Binding Threads}" SortMemberPath="Threads" Width="80" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+
+    <Border Grid.Row="2" Classes="panel" IsVisible="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}">
+      <DockPanel>
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,0,0,8">
+          <Image Source="{Binding Selected.Icon}" Width="32" Height="32" VerticalAlignment="Center"
+                 RenderOptions.BitmapInterpolationMode="HighQuality" />
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+            <TextBlock Text="{Binding Selected.Name}" Classes="title" TextTrimming="CharacterEllipsis" />
+            <TextBlock Text="{Binding SelectedCaption}" Classes="caption" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12">
+            <TextBlock Text="{Binding ActionMessage}" Classes="caption" VerticalAlignment="Center" />
+            <Button Content="Open file location" Command="{Binding RevealCommand}" />
+            <ComboBox ItemsSource="{Binding Priorities}" SelectedItem="{Binding NewPriority}" MinWidth="130" />
+            <Button Content="Set priority" Command="{Binding ApplyPriorityCommand}" />
+            <Button Content="{Binding EndLabel}" Command="{Binding EndProcessCommand}" />
+          </StackPanel>
+        </Grid>
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,0,0,10">
+          <TextBlock Text="LAUNCHED BY" Classes="section" VerticalAlignment="Center" />
+          <TextBlock Grid.Column="1" Text="{Binding LaunchChain}" Classes="mono" TextWrapping="Wrap" VerticalAlignment="Center" />
+        </Grid>
+        <ItemsControl ItemsSource="{Binding Details}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid Rows="1" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:InfoSection">
+              <StackPanel Margin="0,0,16,0" Spacing="3">
+                <TextBlock Text="{Binding Title}" Classes="section" />
+                <ItemsControl ItemsSource="{Binding Items}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:KeyValue">
+                      <Grid ColumnDefinitions="120,*">
+                        <TextBlock Text="{Binding Key}" Classes="caption" />
+                        <TextBlock Grid.Column="1" Text="{Binding Value}" Classes="mono" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Value}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </DockPanel>
+    </Border>
+  </Grid>
+</UserControl>

@@ -1,0 +1,35 @@
+# Pushing a tag like v0.1.0 builds TMNG on a clean Windows machine and publishes
+# a GitHub release with the zip attached. A tag with a hyphen (v0.2.0-beta.1) is
+# published as a pre-release.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build
+        shell: pwsh
+        run: ./build.ps1 -Version ($env:GITHUB_REF_NAME.TrimStart('v'))
+
+      - name: Publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $flags = @('--title', "TMNG $tag", '--generate-notes')
+          if ($tag.Contains('-')) { $flags += '--prerelease' }
+          gh release create $tag "publish/TMNG-$tag.zip" @flags

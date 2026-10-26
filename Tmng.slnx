@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Tmng.App/Tmng.App.csproj" />
+    <Project Path="src/Tmng.Core/Tmng.Core.csproj" />
+    <Project Path="src/Tmng.Platform.Windows/Tmng.Platform.Windows.csproj" />
+  </Folder>
+</Solution>

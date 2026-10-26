@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             x:Class="Tmng.App.Views.ConnectionsView"
+             x:DataType="vm:ConnectionsViewModel">
+  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="14">
+      <TextBox Text="{Binding Filter}" PlaceholderText="Filter by process, address, port, or PID" />
+      <CheckBox Grid.Column="1" Content="Listening only" IsChecked="{Binding ListenersOnly}" />
+      <CheckBox Grid.Column="2" Content="Reachable from network" IsChecked="{Binding ExposedOnly}" />
+      <Button Grid.Column="3" Content="Remove TMNG firewall rules" Command="{Binding RemoveRulesCommand}" />
+    </Grid>
+
+    <Border Grid.Row="1" Classes="panel" Padding="0">
+      <DataGrid ItemsSource="{Binding View}" SelectedItem="{Binding Selected}"
+                IsReadOnly="True" CanUserSortColumns="True" CanUserResizeColumns="True"
+                GridLinesVisibility="None" HeadersVisibility="Column">
+        <DataGrid.Columns>
+          <DataGridTextColumn x:DataType="vm:ConnectionRow" Header="Process" Binding="{Binding Process}" Width="1.3*" />
+          <DataGridTextColumn x:DataType="vm:ConnectionRow" Header="PID" Binding="{Binding Pid}" Width="70" />
+          <DataGridTextColumn x:DataType="vm:ConnectionRow" Header="Protocol" Binding="{Binding Protocol}" Width="80" />
+          <DataGridTextColumn x:DataType="vm:ConnectionRow" Header="Local" Binding="{Binding Local}" Width="1.2*" />
+          <DataGridTextColumn x:DataType="vm:ConnectionRow" Header="Remote" Binding="{Binding Remote}" Width="2*" />
+          <DataGridTextColumn x:DataType="vm:ConnectionRow" Header="State" Binding="{Binding State}" Width="100" />
+          <DataGridTextColumn x:DataType="vm:ConnectionRow" Header="Receive" Binding="{Binding Receive}" SortMemberPath="ReceiveValue" Width="100" />
+          <DataGridTextColumn x:DataType="vm:ConnectionRow" Header="Send" Binding="{Binding Send}" SortMemberPath="SendValue" Width="100" />
+          <DataGridTextColumn x:DataType="vm:ConnectionRow" Header="Exposure" Binding="{Binding Exposure}" SortMemberPath="ExposureRank" Width="170" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+
+    <Border Grid.Row="2" Classes="panel">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+        <StackPanel Spacing="3">
+          <TextBlock Text="{Binding Summary}" Classes="caption" />
+          <TextBlock Text="{Binding ActionMessage}" TextWrapping="Wrap" FontSize="13"
+                     IsVisible="{Binding ActionMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"
+                    IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <Button Content="Close connection" Command="{Binding CloseCommand}" />
+          <Button Content="Block in firewall" Command="{Binding BlockCommand}" />
+          <Button Content="End process" Command="{Binding EndProcessCommand}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

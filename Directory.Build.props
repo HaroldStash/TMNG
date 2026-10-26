@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <!-- Release builds override this with the tag's version (build.ps1 -Version). -->
+    <Version>0.1.0</Version>
+    <!-- Compiled-in source paths (PDBs, CallerFilePath) read /_/ instead of this machine's folders. -->
+    <PathMap>$(MSBuildThisFileDirectory)=/_/</PathMap>
+  </PropertyGroup>
+</Project>

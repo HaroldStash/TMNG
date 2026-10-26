@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             x:Class="Tmng.App.Views.ServicesView"
+             x:DataType="vm:ServicesViewModel">
+  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="14">
+      <TextBox Text="{Binding Filter}" PlaceholderText="Filter by name or PID" />
+      <CheckBox Grid.Column="1" Content="Running only" IsChecked="{Binding RunningOnly}" />
+      <CheckBox Grid.Column="2" Content="Automatic but stopped" IsChecked="{Binding StoppedAutomatic}" />
+    </Grid>
+
+    <Border Grid.Row="1" Classes="panel" Padding="0">
+      <DataGrid ItemsSource="{Binding View}" SelectedItem="{Binding Selected}"
+                IsReadOnly="True" CanUserSortColumns="True" CanUserResizeColumns="True"
+                GridLinesVisibility="None" HeadersVisibility="Column">
+        <DataGrid.Columns>
+          <DataGridTextColumn x:DataType="vm:ServiceRow" Header="Display name" Binding="{Binding DisplayName}" Width="1.6*" />
+          <DataGridTextColumn x:DataType="vm:ServiceRow" Header="Name" Binding="{Binding Name}" Width="*" />
+          <DataGridTextColumn x:DataType="vm:ServiceRow" Header="State" Binding="{Binding State}" Width="90" />
+          <DataGridTextColumn x:DataType="vm:ServiceRow" Header="Start type" Binding="{Binding StartType}" Width="160" />
+          <DataGridTextColumn x:DataType="vm:ServiceRow" Header="PID" Binding="{Binding PidText}" Width="70" />
+          <DataGridTextColumn x:DataType="vm:ServiceRow" Header="Description" Binding="{Binding Description}" Width="2*" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+
+    <Border Grid.Row="2" Classes="panel">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+        <StackPanel Spacing="3">
+          <TextBlock Text="{Binding Summary}" Classes="caption" />
+          <TextBlock Text="{Binding ActionMessage}" TextWrapping="Wrap" FontSize="13"
+                     IsVisible="{Binding ActionMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"
+                    IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <Button Content="Start" Command="{Binding StartCommand}" />
+          <Button Content="Stop" Command="{Binding StopCommand}" />
+          <Button Content="Restart" Command="{Binding RestartCommand}" />
+          <ComboBox ItemsSource="{Binding StartModes}" SelectedItem="{Binding NewStartMode}" MinWidth="170" />
+          <Button Content="Set start type" Command="{Binding ApplyStartModeCommand}" />
+          <Button Content="Go to process" Command="{Binding GoToProcessCommand}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

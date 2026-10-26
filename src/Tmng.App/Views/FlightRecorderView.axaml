@@ -1,0 +1,115 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             xmlns:c="using:Tmng.App.Controls"
+             x:Class="Tmng.App.Views.FlightRecorderView"
+             x:DataType="vm:FlightRecorderViewModel">
+  <Grid ColumnDefinitions="330,*" ColumnSpacing="10">
+
+    <!-- Live: buffer, recording, triggers, saved traces -->
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+      <Border Classes="panel">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Live" Classes="title" />
+          <TextBlock Text="{Binding LiveStatus}" Classes="caption" TextWrapping="Wrap" />
+          <Button Content="{Binding RecordButtonText}" Command="{Binding ToggleRecordCommand}" HorizontalAlignment="Stretch" />
+          <Button Content="Save the rolling buffer now" Command="{Binding SaveBufferCommand}" HorizontalAlignment="Stretch" />
+          <TextBlock Text="{Binding ActionMessage}" TextWrapping="Wrap" FontSize="12.5"
+                     IsVisible="{Binding ActionMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+      </Border>
+
+      <TextBlock Grid.Row="1" Text="Alert rules have their own page under Deep Tools. Each alert saves a trace here."
+                 Classes="caption" TextWrapping="Wrap" Margin="4,0" />
+
+      <Border Grid.Row="2" Classes="panel">
+        <DockPanel>
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+            <TextBlock Text="Saved traces" Classes="title" />
+            <Button Grid.Column="1" Content="Folder" Command="{Binding OpenFolderCommand}" />
+          </Grid>
+          <UniformGrid DockPanel.Dock="Bottom" Columns="3" Margin="0,8,0,0">
+            <Button Content="Open" Command="{Binding OpenCommand}" HorizontalAlignment="Stretch" Margin="0,0,3,0" />
+            <Button Content="Compare" Command="{Binding CompareCommand}" HorizontalAlignment="Stretch" Margin="3,0" />
+            <Button Content="CSV" Command="{Binding ExportCsvCommand}" HorizontalAlignment="Stretch" Margin="3,0,0,0" />
+          </UniformGrid>
+          <ListBox ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile}" Background="Transparent">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:TraceFileRow">
+                <StackPanel>
+                  <TextBlock Text="{Binding Name}" FontSize="12.5" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Detail}" Classes="caption" FontSize="11" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Border>
+    </Grid>
+
+    <!-- Replay -->
+    <Border Grid.Column="1" Classes="panel">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Spacing="2">
+          <TextBlock Text="{Binding TraceTitle}" Classes="title" TextTrimming="CharacterEllipsis" />
+          <TextBlock Text="{Binding TraceDetail}" Classes="caption" />
+        </StackPanel>
+
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="0,8" IsEnabled="{Binding HasTrace}">
+          <Button Content="{Binding PlayButtonText}" Command="{Binding TogglePlayCommand}" MinWidth="70" />
+          <Slider Grid.Column="1" Minimum="0" Maximum="{Binding MaxIndex}" Value="{Binding CursorIndex}" VerticalAlignment="Center" />
+          <TextBlock Grid.Column="2" Text="{Binding CursorTime}" Classes="mono" VerticalAlignment="Center" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,*" ColumnSpacing="10" Height="170" Margin="0,8,0,0">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Text="EVENTS · CLICK TO JUMP" Classes="section" Margin="0,0,0,4" />
+            <ListBox ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}" Background="Transparent">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:EventRow">
+                  <Grid ColumnDefinitions="70,70,*">
+                    <TextBlock Text="{Binding Offset}" Classes="mono" FontSize="12" />
+                    <TextBlock Grid.Column="1" Text="{Binding Kind}" Classes="caption" />
+                    <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </DockPanel>
+          <DockPanel Grid.Column="1">
+            <TextBlock DockPanel.Dock="Top" Text="TOP PROCESSES AT CURSOR" Classes="section" Margin="0,0,0,4" />
+            <ItemsControl ItemsSource="{Binding TopAtCursor}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <TextBlock Text="{Binding}" Classes="mono" FontSize="12" Margin="0,2" TextTrimming="CharacterEllipsis" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </DockPanel>
+        </Grid>
+
+        <ItemsControl ItemsSource="{Binding Panels}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid Columns="2" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:ReplayPanel">
+              <Border Margin="3" Padding="8,6" CornerRadius="4" BorderThickness="1" BorderBrush="{Binding Ink.Border}">
+                <DockPanel>
+                  <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,0,0,4">
+                    <TextBlock Text="{Binding Title}" FontSize="13" Foreground="{Binding Ink.Brush}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Value}" Classes="mono" FontSize="12" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" />
+                  </Grid>
+                  <c:TraceGraph Lines="{Binding Lines}" ShowEdgeMarker="False"
+                                Cursor="{Binding $parent[UserControl].((vm:FlightRecorderViewModel)DataContext).CursorFraction}" />
+                </DockPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </DockPanel>
+    </Border>
+  </Grid>
+</UserControl>

@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             x:Class="Tmng.App.Views.PlaceholderView"
+             x:DataType="vm:PlaceholderViewModel">
+  <Border Classes="panel" VerticalAlignment="Top" MaxWidth="820" HorizontalAlignment="Left" Padding="22,18">
+    <StackPanel Spacing="12">
+      <TextBlock Text="NOT BUILT YET" Classes="section" />
+      <TextBlock Text="{Binding Summary}" FontSize="16" TextWrapping="Wrap" />
+      <ItemsControl ItemsSource="{Binding Plan}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="x:String">
+            <TextBlock Text="{Binding StringFormat='•  {0}'}" Classes="caption" FontSize="13.5" Margin="0,3" TextWrapping="Wrap" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </Border>
+</UserControl>

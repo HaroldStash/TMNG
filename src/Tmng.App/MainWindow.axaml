@@ -1,0 +1,152 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Tmng.App.ViewModels"
+        xmlns:views="using:Tmng.App.Views"
+        xmlns:c="using:Tmng.App.Controls"
+        x:Class="Tmng.App.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="TMNG"
+        Icon="/Assets/tmng.ico"
+        Width="1480" Height="940" MinWidth="1080" MinHeight="700"
+        Background="{DynamicResource WindowBg}">
+
+  <Window.DataTemplates>
+    <DataTemplate DataType="vm:SummaryViewModel"><views:SummaryView /></DataTemplate>
+    <DataTemplate DataType="vm:PerformanceViewModel"><views:PerformanceView /></DataTemplate>
+    <DataTemplate DataType="vm:ProcessesViewModel"><views:ProcessesView /></DataTemplate>
+    <DataTemplate DataType="vm:SystemInfoViewModel"><views:SystemInfoView /></DataTemplate>
+    <DataTemplate DataType="vm:PowerViewModel"><views:PowerView /></DataTemplate>
+    <DataTemplate DataType="vm:ConnectionsViewModel"><views:ConnectionsView /></DataTemplate>
+    <DataTemplate DataType="vm:ServicesViewModel"><views:ServicesView /></DataTemplate>
+    <DataTemplate DataType="vm:StartupViewModel"><views:StartupView /></DataTemplate>
+    <DataTemplate DataType="vm:UsersViewModel"><views:UsersView /></DataTemplate>
+    <DataTemplate DataType="vm:FlightRecorderViewModel"><views:FlightRecorderView /></DataTemplate>
+    <DataTemplate DataType="vm:AlertsViewModel"><views:AlertsView /></DataTemplate>
+    <DataTemplate DataType="vm:DiskSpaceViewModel"><views:DiskSpaceView /></DataTemplate>
+    <DataTemplate DataType="vm:InstalledAppsViewModel"><views:InstalledAppsView /></DataTemplate>
+    <DataTemplate DataType="vm:BenchmarksViewModel"><views:BenchmarksView /></DataTemplate>
+    <DataTemplate DataType="vm:PlaceholderViewModel"><views:PlaceholderView /></DataTemplate>
+    <DataTemplate DataType="vm:SettingsViewModel"><views:SettingsView /></DataTemplate>
+  </Window.DataTemplates>
+
+  <Panel>
+  <Grid ColumnDefinitions="236,*" RowDefinitions="*,Auto">
+
+    <!-- Sidebar -->
+    <Border Grid.RowSpan="2" Background="{DynamicResource SidebarBg}" BorderBrush="{DynamicResource SidebarBorder}" BorderThickness="0,0,1,0">
+      <DockPanel Margin="10,14,10,10">
+        <StackPanel DockPanel.Dock="Bottom" Spacing="6">
+          <ListBox Classes="nav" ItemsSource="{Binding SettingsPages}" SelectedItem="{Binding SelectedSettings}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:PageViewModel">
+                <StackPanel Orientation="Horizontal" Spacing="14">
+                  <TextBlock Classes="glyph" Text="{Binding Glyph}" />
+                  <TextBlock Text="{Binding Title}" FontSize="14.5" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <TextBlock Text="{Binding ElevationText}" Classes="caption" HorizontalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+          <StackPanel Orientation="Horizontal" Spacing="10" Margin="12,0,0,12">
+            <Image Source="/Assets/tmng.png" Width="30" Height="30" VerticalAlignment="Center"
+                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+            <TextBlock Text="TMNG" FontSize="26" FontWeight="Light" LetterSpacing="6" Foreground="{DynamicResource Brand}"
+                       VerticalAlignment="Center" c:Glow.Text="True" c:Glow.Radius="16" />
+          </StackPanel>
+          <ListBox Classes="nav" ItemsSource="{Binding LivePages}" SelectedItem="{Binding SelectedLive}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:PageViewModel">
+                <StackPanel Orientation="Horizontal" Spacing="14">
+                  <TextBlock Classes="glyph" Text="{Binding Glyph}" />
+                  <TextBlock Text="{Binding Title}" FontSize="14.5" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <TextBlock Text="DEEP TOOLS" Classes="section" Margin="12,10,0,2" />
+          <ListBox Classes="nav" ItemsSource="{Binding DeepPages}" SelectedItem="{Binding SelectedDeep}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:PageViewModel">
+                <StackPanel Orientation="Horizontal" Spacing="14">
+                  <TextBlock Classes="glyph" Text="{Binding Glyph}" />
+                  <TextBlock Text="{Binding Title}" FontSize="14.5" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <!-- Page -->
+    <DockPanel Grid.Column="1">
+      <Border DockPanel.Dock="Top" IsVisible="{Binding ShowBanner}" Margin="20,12,20,0" Padding="14,10" CornerRadius="6"
+              Background="{DynamicResource WarningBg}" BorderBrush="{DynamicResource WarningBorder}" BorderThickness="1">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+          <TextBlock Classes="glyph" Text="&#xE7BA;" Foreground="{DynamicResource Warning}" />
+          <StackPanel Grid.Column="1" Spacing="2">
+            <TextBlock Text="{Binding BannerText}" TextWrapping="Wrap" FontSize="13" />
+            <TextBlock Text="{Binding BannerMessage}" IsVisible="{Binding BannerMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                       Classes="caption" TextWrapping="Wrap" />
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <Button Content="Install sensor driver" Command="{Binding InstallDriverCommand}"
+                    IsVisible="{Binding !DriverInstalled}" IsEnabled="{Binding !Installing}" />
+            <Button Content="Restart as administrator" Command="{Binding RestartElevatedCommand}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+      <TextBlock DockPanel.Dock="Top" Classes="pageTitle" Text="{Binding CurrentPage.Title}" Margin="24,14,24,10" />
+      <ContentControl Content="{Binding CurrentPage}" Margin="20,0,20,12" />
+    </DockPanel>
+
+    <!-- Status bar -->
+    <Border Grid.Column="1" Grid.Row="1" Background="{DynamicResource SidebarBg}" BorderBrush="{DynamicResource SidebarBorder}" BorderThickness="0,1,0,0" Padding="20,7">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+        <StackPanel Orientation="Horizontal" Spacing="10" ToolTip.Tip="{Binding StatusDetail}">
+          <Ellipse Width="9" Height="9" Fill="{Binding StatusBrush}" VerticalAlignment="Center" />
+          <TextBlock Text="{Binding Status}" Classes="caption" />
+        </StackPanel>
+
+        <!-- Flight Recorder: visible from every page so a running recording is never forgotten -->
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Ellipse Classes="recDot" Classes.recording="{Binding FlightRecorder.IsRecording}" Width="9" Height="9" VerticalAlignment="Center" />
+          <Button Classes="recButton" Command="{Binding ShowFlightRecorderCommand}" ToolTip.Tip="Open Flight Recorder" VerticalAlignment="Center">
+            <TextBlock Text="{Binding FlightRecorder.RecordingName}" Classes="caption" MaxWidth="280" TextTrimming="CharacterEllipsis" />
+          </Button>
+          <TextBlock Text="{Binding FlightRecorder.RecordingElapsed}" Classes="mono" VerticalAlignment="Center" />
+          <Button Classes="recButton" Command="{Binding FlightRecorder.StartRecordingCommand}" ToolTip.Tip="Start recording" AutomationProperties.Name="Start recording" VerticalAlignment="Center">
+            <TextBlock Classes="glyph" Text="&#xE7C8;" FontSize="12" Foreground="{DynamicResource Danger}" />
+          </Button>
+          <Button Classes="recButton" Command="{Binding FlightRecorder.StopRecordingCommand}" ToolTip.Tip="Stop and save" AutomationProperties.Name="Stop and save" VerticalAlignment="Center">
+            <TextBlock Classes="glyph" Text="&#xE71A;" FontSize="12" />
+          </Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+
+  <!-- Confirmation before an action changes the system -->
+  <Border x:DataType="vm:ConfirmDialog" DataContext="{x:Static vm:ConfirmDialog.Shared}"
+          IsVisible="{Binding IsOpen}" Background="{DynamicResource Overlay}">
+    <Border Classes="panel" Width="460" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Padding="24,20" BorderBrush="{DynamicResource Warning}" BoxShadow="0 12 40 0 #80000000">
+      <StackPanel Spacing="14">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <TextBlock Classes="glyph" Text="&#xE7BA;" Foreground="{DynamicResource Warning}" FontSize="20" />
+          <TextBlock Text="{Binding Title}" Classes="title" FontSize="20" />
+        </StackPanel>
+        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="14" Foreground="{DynamicResource TextBody}" />
+        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Margin="0,6,0,0">
+          <Button Content="Cancel" Command="{Binding CancelCommand}" IsCancel="True" MinWidth="90" HorizontalContentAlignment="Center" />
+          <Button Content="{Binding ConfirmText}" Command="{Binding AcceptCommand}" MinWidth="90" HorizontalContentAlignment="Center"
+                  Background="{DynamicResource Danger}" Foreground="White" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </Border>
+  </Panel>
+</Window>

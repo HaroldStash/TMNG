@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             x:Class="Tmng.App.Views.UsersView"
+             x:DataType="vm:UsersViewModel">
+  <Grid RowDefinitions="*,Auto" RowSpacing="10">
+    <Border Classes="panel" Padding="0">
+      <DataGrid ItemsSource="{Binding Sessions}" SelectedItem="{Binding Selected}"
+                IsReadOnly="True" GridLinesVisibility="None" HeadersVisibility="Column">
+        <DataGrid.Columns>
+          <DataGridTextColumn x:DataType="vm:SessionRow" Header="User" Binding="{Binding User}" Width="2*" />
+          <DataGridTextColumn x:DataType="vm:SessionRow" Header="Session" Binding="{Binding Id}" Width="80" />
+          <DataGridTextColumn x:DataType="vm:SessionRow" Header="State" Binding="{Binding State}" Width="110" />
+          <DataGridTextColumn x:DataType="vm:SessionRow" Header="From" Binding="{Binding Client}" Width="*" />
+          <DataGridTextColumn x:DataType="vm:SessionRow" Header="Processes" Binding="{Binding Processes}" Width="100" />
+          <DataGridTextColumn x:DataType="vm:SessionRow" Header="CPU" Binding="{Binding Cpu}" Width="80" />
+          <DataGridTextColumn x:DataType="vm:SessionRow" Header="Memory" Binding="{Binding Memory}" Width="110" />
+          <DataGridTextColumn x:DataType="vm:SessionRow" Header="Disk" Binding="{Binding Disk}" Width="110" />
+          <DataGridTextColumn x:DataType="vm:SessionRow" Header="Network" Binding="{Binding Network}" Width="110" />        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+
+    <Border Grid.Row="1" Classes="panel">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+        <TextBlock Text="{Binding ActionMessage}" TextWrapping="Wrap" FontSize="13" VerticalAlignment="Center" />
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                    IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <Button Content="Disconnect" Command="{Binding DisconnectCommand}" />
+          <Button Content="Sign out" Command="{Binding SignOutCommand}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

@@ -1,0 +1,105 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             x:Class="Tmng.App.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="12" MaxWidth="900" HorizontalAlignment="Left" Margin="0,0,14,12">
+
+      <Border Classes="panel">
+        <StackPanel Spacing="10">
+          <TextBlock Text="Appearance" Classes="title" />
+          <ListBox ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}" Background="Transparent">
+            <ListBox.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="10" />
+              </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:ThemeOption">
+                <StackPanel Width="230" Spacing="6" Margin="2">
+                  <Border Height="96" CornerRadius="6" Background="{Binding Background}" BorderBrush="{DynamicResource PanelBorder}"
+                          BorderThickness="1" ClipToBounds="True">
+                    <Panel Margin="10,12">
+                      <Path Data="M0,52 L25,44 L50,48 L75,22 L100,34 L125,14 L150,26 L175,8 L200,18" Stroke="{Binding Line}"
+                            StrokeThickness="6" Opacity="0.35" IsVisible="{Binding Glow}" StrokeJoin="Round">
+                        <Path.Effect>
+                          <BlurEffect Radius="6" />
+                        </Path.Effect>
+                      </Path>
+                      <Path Data="M0,52 L25,44 L50,48 L75,22 L100,34 L125,14 L150,26 L175,8 L200,18" Stroke="{Binding Line}"
+                            StrokeThickness="2" StrokeJoin="Round" />
+                    </Panel>
+                  </Border>
+                  <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding Description}" Classes="caption" TextWrapping="Wrap" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <TextBlock Text="Graph colours" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding Schemes}" SelectedItem="{Binding SelectedScheme}" MinWidth="160">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:SchemeOption">
+                  <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Text="Full colour gives each kind of reading its own colour; the others use one hue throughout."
+                       Classes="caption" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="420" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="panel">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Background monitoring" Classes="title" />
+          <CheckBox Content="Keep running in the notification area when the window is closed" IsChecked="{Binding CloseToTray}" />
+          <CheckBox Content="Start TMNG in the notification area at sign-in" IsChecked="{Binding StartAtSignIn}" />
+          <TextBlock Text="{Binding BackgroundMessage}" Classes="caption" TextWrapping="Wrap" Margin="28,0,0,0"
+                     IsVisible="{Binding BackgroundMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+          <TextBlock Text="Turning sign-in start on while running as administrator makes TMNG start elevated, without a prompt."
+                     Classes="caption" TextWrapping="Wrap" Margin="28,0,0,0" IsVisible="{Binding !IsElevated}" />
+        </StackPanel>
+      </Border>
+
+      <Border Classes="panel">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Alerts" Classes="title" />
+          <CheckBox Content="Show a Windows notification when an alert rule fires" IsChecked="{Binding Notifications}" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Content="Edit alert rules" Command="{Binding OpenAlertRulesCommand}" />
+            <TextBlock Text="Rules, thresholds and the history of fired alerts live on the Alerts page."
+                       Classes="caption" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="560" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="panel">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Processes" Classes="title" />
+          <CheckBox Content="Include TMNG itself in process lists and totals" IsChecked="{Binding IncludeSelf}" />
+        </StackPanel>
+      </Border>
+
+      <Border Classes="panel">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Administrator and sensors" Classes="title" />
+          <TextBlock Text="{Binding ElevationText}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding DriverText}" Classes="caption" TextWrapping="Wrap" />
+          <Button Content="Restart as administrator" Command="{Binding RestartElevatedCommand}" IsVisible="{Binding !IsElevated}" />
+        </StackPanel>
+      </Border>
+
+      <Border Classes="panel">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Storage" Classes="title" />
+          <TextBlock Text="{Binding SettingsPath, StringFormat='Settings are saved to {0}'}" Classes="caption" TextWrapping="Wrap" />
+          <Button Content="Open settings folder" Command="{Binding OpenSettingsFolderCommand}" />
+        </StackPanel>
+      </Border>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

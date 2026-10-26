@@ -1,0 +1,124 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             xmlns:c="using:Tmng.App.Controls"
+             x:Class="Tmng.App.Views.DiskSpaceView"
+             x:DataType="vm:DiskSpaceViewModel">
+  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+    <Border Classes="panel">
+      <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="10">
+        <ComboBox ItemsSource="{Binding Drives}" SelectedItem="{Binding SelectedDrive}" MinWidth="90" IsEnabled="{Binding !Scanning}" />
+        <Button Grid.Column="1" Content="Scan" Command="{Binding ScanCommand}" IsEnabled="{Binding !Scanning}" />
+        <Button Grid.Column="2" Content="Cancel" Command="{Binding CancelCommand}" IsEnabled="{Binding Scanning}" />
+        <StackPanel Grid.Column="3" VerticalAlignment="Center">
+          <TextBlock Text="{Binding ProgressText}" Classes="caption" />
+          <TextBlock Text="{Binding ResultText}" FontSize="13" TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <TabControl Grid.Row="1" Padding="0,8,0,0">
+      <TabItem Header="Folders">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="8">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+            <Button Content="Up" Command="{Binding UpCommand}" />
+            <TextBlock Grid.Column="1" Text="{Binding Location}" Classes="mono" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+          </Grid>
+          <Grid Grid.Row="1" ColumnDefinitions="1.3*,*" ColumnSpacing="10">
+            <Border Classes="panel" Padding="2">
+              <c:Treemap Items="{Binding Treemap}" Accent="{Binding Inks.Memory.Accent}" ItemCommand="{Binding EnterCommand}" />
+            </Border>
+            <Border Grid.Column="1" Classes="panel" Padding="0">
+              <DataGrid ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" IsReadOnly="True"
+                        CanUserSortColumns="True" GridLinesVisibility="None" HeadersVisibility="Column"
+                        DoubleTapped="OnRowDoubleTapped">
+                <DataGrid.Columns>
+                  <DataGridTextColumn x:DataType="vm:DiskRow" Header="Name" Binding="{Binding Name}" Width="2*" />
+                  <DataGridTextColumn x:DataType="vm:DiskRow" Header="Size" Binding="{Binding SizeText}" SortMemberPath="Size" Width="90" />
+                  <DataGridTextColumn x:DataType="vm:DiskRow" Header="Share" Binding="{Binding Share}" SortMemberPath="Size" Width="70" />
+                  <DataGridTextColumn x:DataType="vm:DiskRow" Header="Files" Binding="{Binding Files}" Width="90" />
+                  <DataGridTextColumn x:DataType="vm:DiskRow" Header="Modified" Binding="{Binding Modified}" Width="95" />
+                </DataGrid.Columns>
+              </DataGrid>
+            </Border>
+          </Grid>
+          <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <TextBlock Text="Double-click a folder or click the map to open it." Classes="caption" VerticalAlignment="Center" />
+            <Button Content="Open in Explorer" Command="{Binding RevealCommand}" CommandParameter="folders" />
+            <Button Content="Recycle" Command="{Binding RecycleCommand}" CommandParameter="folders" />
+          </StackPanel>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Largest files">
+        <Grid RowDefinitions="*,Auto" RowSpacing="8">
+          <Border Classes="panel" Padding="0">
+            <DataGrid ItemsSource="{Binding Largest}" SelectedItem="{Binding SelectedLargest}" IsReadOnly="True"
+                      GridLinesVisibility="None" HeadersVisibility="Column">
+              <DataGrid.Columns>
+                <DataGridTextColumn x:DataType="vm:DiskRow" Header="Size" Binding="{Binding SizeText}" SortMemberPath="Size" Width="100" />
+                <DataGridTextColumn x:DataType="vm:DiskRow" Header="Modified" Binding="{Binding Modified}" Width="100" />
+                <DataGridTextColumn x:DataType="vm:DiskRow" Header="Path" Binding="{Binding Path}" Width="*" />
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+          <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Button Content="Open in Explorer" Command="{Binding RevealCommand}" CommandParameter="largest" />
+            <Button Content="Recycle" Command="{Binding RecycleCommand}" CommandParameter="largest" />
+          </StackPanel>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Stale files">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Not modified in" VerticalAlignment="Center" />
+            <NumericUpDown Value="{Binding StaleDays}" Minimum="30" Maximum="3650" Increment="30" Width="130" />
+            <TextBlock Text="days" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding StaleSummary}" Classes="caption" VerticalAlignment="Center" Margin="12,0,0,0" />
+          </StackPanel>
+          <Border Grid.Row="1" Classes="panel" Padding="0">
+            <DataGrid ItemsSource="{Binding Stale}" SelectedItem="{Binding SelectedStale}" IsReadOnly="True"
+                      GridLinesVisibility="None" HeadersVisibility="Column">
+              <DataGrid.Columns>
+                <DataGridTextColumn x:DataType="vm:DiskRow" Header="Size" Binding="{Binding SizeText}" SortMemberPath="Size" Width="100" />
+                <DataGridTextColumn x:DataType="vm:DiskRow" Header="Modified" Binding="{Binding Modified}" Width="100" />
+                <DataGridTextColumn x:DataType="vm:DiskRow" Header="Path" Binding="{Binding Path}" Width="*" />
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+          <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Button Content="Open in Explorer" Command="{Binding RevealCommand}" CommandParameter="stale" />
+            <Button Content="Recycle" Command="{Binding RecycleCommand}" CommandParameter="stale" />
+          </StackPanel>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Duplicates">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Content="Find duplicates" Command="{Binding FindDuplicatesCommand}" IsEnabled="{Binding !Scanning}" />
+            <TextBlock Text="{Binding DuplicateSummary}" Classes="caption" VerticalAlignment="Center" />
+          </StackPanel>
+          <Border Grid.Row="1" Classes="panel" Padding="0">
+            <DataGrid ItemsSource="{Binding Duplicates}" SelectedItem="{Binding SelectedDuplicate}" IsReadOnly="True"
+                      GridLinesVisibility="None" HeadersVisibility="Column">
+              <DataGrid.Columns>
+                <DataGridTextColumn x:DataType="vm:DuplicateRow" Header="Set" Binding="{Binding Group}" Width="60" />
+                <DataGridTextColumn x:DataType="vm:DuplicateRow" Header="Each" Binding="{Binding SizeText}" Width="100" />
+                <DataGridTextColumn x:DataType="vm:DuplicateRow" Header="Path" Binding="{Binding Path}" Width="*" />
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+          <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Button Content="Open in Explorer" Command="{Binding RevealCommand}" CommandParameter="duplicates" />
+            <Button Content="Recycle this copy" Command="{Binding RecycleCommand}" CommandParameter="duplicates" />
+          </StackPanel>
+        </Grid>
+      </TabItem>
+    </TabControl>
+
+    <TextBlock Grid.Row="2" Text="{Binding ActionMessage}" TextWrapping="Wrap" FontSize="13"
+               IsVisible="{Binding ActionMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+  </Grid>
+</UserControl>

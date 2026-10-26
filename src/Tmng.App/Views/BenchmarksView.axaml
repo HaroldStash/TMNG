@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             x:Class="Tmng.App.Views.BenchmarksView"
+             x:DataType="vm:BenchmarksViewModel">
+  <Grid ColumnDefinitions="360,*" ColumnSpacing="10">
+    <Border Classes="panel">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,10,0,0">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <TextBlock Text="Drive for disk tests" VerticalAlignment="Center" Classes="caption" />
+            <ComboBox Grid.Column="1" ItemsSource="{Binding Drives}" SelectedItem="{Binding DiskDrive}" HorizontalAlignment="Stretch" />
+          </Grid>
+          <TextBlock Text="Disk tests write and delete a 1 GiB temporary file. Close heavy apps for repeatable results." Classes="caption" TextWrapping="Wrap" />
+          <UniformGrid Columns="2">
+            <Button Content="Run" Command="{Binding RunCommand}" IsEnabled="{Binding !Running}" HorizontalAlignment="Stretch" Margin="0,0,4,0" />
+            <Button Content="Cancel" Command="{Binding CancelCommand}" IsEnabled="{Binding Running}" HorizontalAlignment="Stretch" Margin="4,0,0,0" />
+          </UniformGrid>
+          <TextBlock Text="{Binding Progress}" TextWrapping="Wrap" FontSize="13" />
+        </StackPanel>
+        <StackPanel Spacing="6">
+          <TextBlock Text="Tests" Classes="title" />
+          <TextBlock Text="{Binding SimdNote}" Classes="caption" />
+          <ItemsControl ItemsSource="{Binding Tests}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:TestOption">
+                <CheckBox IsChecked="{Binding Selected}" Margin="0,2">
+                  <StackPanel>
+                    <TextBlock Text="{Binding Name}" FontSize="13.5" />
+                    <TextBlock Text="{Binding Description}" Classes="caption" TextWrapping="Wrap" />
+                  </StackPanel>
+                </CheckBox>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*" RowSpacing="10">
+      <Border Classes="panel" Padding="0">
+        <DataGrid ItemsSource="{Binding Results}" IsReadOnly="True" GridLinesVisibility="None" HeadersVisibility="Column" MinHeight="120">
+          <DataGrid.Columns>
+            <DataGridTextColumn x:DataType="vm:ResultRow" Header="Test" Binding="{Binding Test}" Width="1.4*" />
+            <DataGridTextColumn x:DataType="vm:ResultRow" Header="Result" Binding="{Binding Result}" Width="*" />
+            <DataGridTextColumn x:DataType="vm:ResultRow" Header="Your baseline" Binding="{Binding Baseline}" Width="*" />
+            <DataGridTextColumn x:DataType="vm:ResultRow" Header="Change" Binding="{Binding Change}" Width="90" />
+            <DataGridTextColumn x:DataType="vm:ResultRow" Header="Verdict" Binding="{Binding Verdict}" Width="150" />
+          </DataGrid.Columns>
+        </DataGrid>
+      </Border>
+      <Border Grid.Row="1" Classes="panel" IsVisible="{Binding Changes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+              Background="{DynamicResource WarningBg}" BorderBrush="{DynamicResource WarningBorder}">
+        <TextBlock Text="{Binding Changes}" TextWrapping="Wrap" FontSize="13" />
+      </Border>
+      <Border Grid.Row="2" Classes="panel">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Text="History" Classes="title" Margin="0,0,0,6" />
+          <TextBlock DockPanel.Dock="Top" Text="Baseline = median of your last five runs on this PC. A result 7% worse than baseline is flagged." Classes="caption" Margin="0,0,0,6" />
+          <ListBox ItemsSource="{Binding Runs}" Background="Transparent">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:HistoryRow">
+                <Grid ColumnDefinitions="150,*">
+                  <TextBlock Text="{Binding When}" Classes="mono" FontSize="12" />
+                  <TextBlock Grid.Column="1" Text="{Binding Summary}" Classes="caption" TextWrapping="Wrap" />
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

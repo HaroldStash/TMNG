@@ -1,0 +1,36 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             x:Class="Tmng.App.Views.PowerView"
+             x:DataType="vm:PowerViewModel">
+  <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+    <UniformGrid Columns="4">
+      <Border Classes="panel" Margin="0,0,5,0" Background="{Binding Inks.Energy.Panel}" BorderBrush="{Binding Inks.Energy.Border}">
+        <StackPanel><TextBlock Text="CPU package" Classes="caption" /><TextBlock Text="{Binding CpuPower}" Classes="value" Foreground="{Binding Inks.Energy.Brush}" /></StackPanel>
+      </Border>
+      <Border Classes="panel" Margin="5,0" Background="{Binding Inks.Gpu.Panel}" BorderBrush="{Binding Inks.Gpu.Border}">
+        <StackPanel><TextBlock Text="GPU power" Classes="caption" /><TextBlock Text="{Binding GpuPower}" Classes="value" Foreground="{Binding Inks.Gpu.Brush}" /></StackPanel>
+      </Border>
+      <Border Classes="panel" Margin="5,0" Background="{Binding Inks.Clock.Panel}" BorderBrush="{Binding Inks.Clock.Border}">
+        <StackPanel><TextBlock Text="Effective CPU clock" Classes="caption" /><TextBlock Text="{Binding Clock}" Classes="value" Foreground="{Binding Inks.Clock.Brush}" /></StackPanel>
+      </Border>
+      <Border Classes="panel" Margin="5,0,0,0" Background="{Binding Inks.Cpu.Panel}" BorderBrush="{Binding Inks.Cpu.Border}">
+        <StackPanel><TextBlock Text="Battery" Classes="caption" /><TextBlock Text="{Binding Battery}" Classes="value" Foreground="{Binding Inks.Cpu.Brush}" /></StackPanel>
+      </Border>
+    </UniformGrid>
+
+    <TextBlock Grid.Row="1" Text="{Binding ElevationNote}" Classes="caption" TextWrapping="Wrap" />
+
+    <Border Grid.Row="2" Classes="panel" Padding="0">
+      <DataGrid ItemsSource="{Binding Sensors}" IsReadOnly="True" CanUserSortColumns="True"
+                GridLinesVisibility="None" HeadersVisibility="Column">
+        <DataGrid.Columns>
+          <DataGridTextColumn x:DataType="vm:SensorRow" Header="Hardware" Binding="{Binding Hardware}" Width="2*" />
+          <DataGridTextColumn x:DataType="vm:SensorRow" Header="Sensor" Binding="{Binding Name}" Width="2*" />
+          <DataGridTextColumn x:DataType="vm:SensorRow" Header="Type" Binding="{Binding Type}" Width="*" />
+          <DataGridTextColumn x:DataType="vm:SensorRow" Header="Value" Binding="{Binding Value}" Width="*" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+  </Grid>
+</UserControl>

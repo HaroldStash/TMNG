@@ -1,0 +1,204 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             xmlns:core="using:Tmng.Core"
+             x:Class="Tmng.App.Views.AlertsView"
+             x:DataType="vm:AlertsViewModel">
+  <UserControl.Styles>
+    <Style Selector="Button.help">
+      <Setter Property="Width" Value="26" />
+      <Setter Property="Height" Value="26" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="13" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.helpBody">
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{DynamicResource TextBody}" />
+    </Style>
+    <Style Selector="Border.ruleCard">
+      <Setter Property="BorderBrush" Value="{DynamicResource SidebarBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="12,10" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid ColumnDefinitions="*,420" ColumnSpacing="10">
+
+    <!-- Rules -->
+    <Border Classes="panel">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Spacing="10" Margin="0,0,0,10">
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+            <TextBlock Text="Rules" Classes="title" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="+ New rule" Command="{Binding AddRuleCommand}" />
+            <Button Grid.Column="2" Classes="help" Content="?" ToolTip.Tip="How alerts work" AutomationProperties.Name="How alerts work">
+              <Button.Flyout>
+                <Flyout Placement="LeftEdgeAlignedTop">
+                  <StackPanel Width="400" Spacing="10" Margin="4">
+                    <TextBlock Text="How alerts work" Classes="title" />
+                    <TextBlock Classes="helpBody"
+                               Text="{Binding BufferText, StringFormat='TMNG always keeps the last {0} of every reading, one sample a second. You never have to start anything for alerts to work.'}" />
+                    <StackPanel Spacing="3">
+                      <TextBlock Text="A RULE" Classes="section" />
+                      <TextBlock Classes="helpBody"
+                                 Text="Watches one or more conditions, like &quot;CPU usage above 90 %&quot; or &quot;CPU fan below 600 RPM&quot;. Any reading TMNG shows can be used, including every sensor on the Power &amp; Freq page." />
+                      <TextBlock Classes="helpBody"
+                                 Text="With &quot;all&quot;, every condition must be true at the same time. With &quot;any&quot;, one is enough." />
+                    </StackPanel>
+                    <StackPanel Spacing="3">
+                      <TextBlock Text="IT FIRES WHEN" Classes="section" />
+                      <TextBlock Classes="helpBody"
+                                 Text="The rule stays true for the whole time you set. &quot;For 10 s&quot; means ten seconds in a row; one second where it is not true starts the count again." />
+                    </StackPanel>
+                    <StackPanel Spacing="3">
+                      <TextBlock Text="THEN" Classes="section" />
+                      <TextBlock Classes="helpBody"
+                                 Text="You get a Windows notification (if they are on) naming the busiest process. TMNG keeps recording for the time set under Capture, then saves one trace with everything before and after. It appears under History with how high (or low) each reading went." />
+                    </StackPanel>
+                    <StackPanel Spacing="3">
+                      <TextBlock Text="GOOD TO KNOW" Classes="section" />
+                      <TextBlock Classes="helpBody"
+                                 Text="• Each rule waits 5 minutes before it can fire again, so a long spike makes one trace, not dozens." />
+                      <TextBlock Classes="helpBody"
+                                 Text="• A reading TMNG cannot measure never counts as true. In an &quot;all&quot; rule that keeps the rule from firing; in an &quot;any&quot; rule the other conditions still work. CPU temperature, for example, needs administrator rights." />
+                      <TextBlock Classes="helpBody"
+                                 Text="• Alerts only run while TMNG is running, including when it is closed to the tray. Turn on start at sign-in in Settings to keep them always on." />
+                      <TextBlock Classes="helpBody"
+                                 Text="• Alerts and the Record button are separate: an alert never starts or stops a manual recording." />
+                    </StackPanel>
+                  </StackPanel>
+                </Flyout>
+              </Button.Flyout>
+            </Button>
+          </Grid>
+
+          <CheckBox Content="Show a Windows notification when a rule fires" IsChecked="{Binding Notifications}" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="Capture" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding CaptureOptions}" SelectedItem="{Binding Capture}" MinWidth="150" />
+            <TextBlock Text="after an alert fires" Classes="caption" VerticalAlignment="Center" />
+          </StackPanel>
+        </StackPanel>
+
+        <ScrollViewer>
+          <ItemsControl ItemsSource="{Binding Rules}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Spacing="8" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:RuleRow">
+                <Border Classes="ruleCard">
+                  <StackPanel Spacing="10">
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+                      <CheckBox IsChecked="{Binding Enabled}" MinWidth="0" VerticalAlignment="Center"
+                                ToolTip.Tip="Watch this rule" />
+                      <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Summary}" Classes="caption" TextWrapping="Wrap" IsVisible="{Binding HasName}" />
+                      </StackPanel>
+                      <Button Grid.Column="2" Content="{Binding EditLabel}" Command="{Binding ToggleEditCommand}" VerticalAlignment="Center" />
+                      <Button Grid.Column="3" Content="Delete" Command="{Binding DeleteCommand}" IsVisible="{Binding CanDelete}" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <StackPanel Spacing="10" IsVisible="{Binding IsEditing}" Margin="28,0,0,0">
+                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <TextBlock Text="Name" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" Text="{Binding Name}" PlaceholderText="Optional. Blank uses the conditions as the name." />
+                      </Grid>
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Fire when" VerticalAlignment="Center" />
+                        <ComboBox ItemsSource="{Binding $parent[UserControl].((vm:AlertsViewModel)DataContext).Matches}"
+                                  SelectedItem="{Binding Match}" MinWidth="80" />
+                        <TextBlock Text="of these are true for" VerticalAlignment="Center" />
+                        <NumericUpDown Value="{Binding Seconds}" Minimum="1" Maximum="3600" Width="80" ShowButtonSpinner="False" />
+                        <TextBlock Text="seconds in a row" VerticalAlignment="Center" />
+                      </StackPanel>
+
+                      <ItemsControl ItemsSource="{Binding Conditions}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate>
+                            <StackPanel Spacing="6" />
+                          </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:ConditionRow">
+                            <Grid ColumnDefinitions="*,100,90,50,130,Auto" ColumnSpacing="8">
+                              <ComboBox ItemsSource="{Binding $parent[UserControl].((vm:AlertsViewModel)DataContext).MetricChoices}"
+                                        SelectedItem="{Binding Metric}" HorizontalAlignment="Stretch" MaxDropDownHeight="420">
+                                <ComboBox.ItemTemplate>
+                                  <DataTemplate x:DataType="core:MetricInfo">
+                                    <StackPanel>
+                                      <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
+                                      <TextBlock Text="{Binding Group}" Classes="caption" FontSize="11" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                  </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                              </ComboBox>
+                              <ComboBox Grid.Column="1" ItemsSource="{Binding $parent[UserControl].((vm:AlertsViewModel)DataContext).Comparisons}"
+                                        SelectedItem="{Binding Comparison}" HorizontalAlignment="Stretch" />
+                              <NumericUpDown Grid.Column="2" Value="{Binding Threshold}" ShowButtonSpinner="False" />
+                              <TextBlock Grid.Column="3" Text="{Binding Unit}" Classes="caption" VerticalAlignment="Center" />
+                              <TextBlock Grid.Column="4" Text="{Binding NowText}" Classes="caption" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                              <Button Grid.Column="5" Content="Remove" Command="{Binding RemoveCommand}" IsVisible="{Binding CanRemove}" />
+                            </Grid>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <Button Content="+ Add condition" Command="{Binding AddConditionCommand}" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </DockPanel>
+    </Border>
+
+    <!-- History -->
+    <Border Grid.Column="1" Classes="panel">
+      <DockPanel>
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+          <TextBlock Text="History" Classes="title" />
+          <Button Grid.Column="1" Content="Clear" Command="{Binding ClearHistoryCommand}" />
+        </Grid>
+        <TextBlock DockPanel.Dock="Top" Text="No alerts have fired yet. Turn on a rule to start watching."
+                   Classes="caption" TextWrapping="Wrap" IsVisible="{Binding !History.Count}" />
+        <ScrollViewer>
+          <ItemsControl ItemsSource="{Binding History}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:AlertRow">
+                <Border BorderBrush="{DynamicResource SidebarBorder}" BorderThickness="0,0,0,1" Padding="0,8">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <StackPanel Spacing="2">
+                      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <TextBlock Text="{Binding Rule}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Reason}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Time}" Classes="mono" FontSize="12" />
+                      </Grid>
+                      <TextBlock Text="{Binding Extremes}" Classes="caption" TextWrapping="Wrap" />
+                      <TextBlock Classes="caption" TextTrimming="CharacterEllipsis">
+                        <Run Text="Top: " />
+                        <Run Text="{Binding Top}" />
+                        <Run Text=" · " />
+                        <Run Text="{Binding Status}" />
+                      </TextBlock>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Open" Command="{Binding OpenCommand}"
+                            IsEnabled="{Binding CanOpen}" VerticalAlignment="Center" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </DockPanel>
+    </Border>
+  </Grid>
+</UserControl>

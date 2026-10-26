@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             x:Class="Tmng.App.Views.InstalledAppsView"
+             x:DataType="vm:InstalledAppsViewModel">
+  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="14">
+      <TextBox Text="{Binding Filter}" PlaceholderText="Filter by name or publisher" />
+      <CheckBox Grid.Column="1" Content="Show Windows components" IsChecked="{Binding ShowComponents}" />
+      <Button Grid.Column="2" Content="Check for upgrades" Command="{Binding CheckUpgradesCommand}" IsEnabled="{Binding !Busy}" />
+      <Button Grid.Column="3" Content="Reload" Command="{Binding ReloadCommand}" />
+    </Grid>
+
+    <Border Grid.Row="1" Classes="panel" Padding="0">
+      <DataGrid ItemsSource="{Binding View}" SelectedItem="{Binding Selected}"
+                IsReadOnly="True" CanUserSortColumns="True" CanUserResizeColumns="True"
+                GridLinesVisibility="None" HeadersVisibility="Column">
+        <DataGrid.Columns>
+          <DataGridTextColumn x:DataType="vm:AppRow" Header="Name" Binding="{Binding Name}" Width="2*" />
+          <DataGridTextColumn x:DataType="vm:AppRow" Header="Publisher" Binding="{Binding Publisher}" Width="1.2*" />
+          <DataGridTextColumn x:DataType="vm:AppRow" Header="Version" Binding="{Binding Version}" Width="110" />
+          <DataGridTextColumn x:DataType="vm:AppRow" Header="Size" Binding="{Binding SizeText}" SortMemberPath="SizeValue" Width="120" />
+          <DataGridTextColumn x:DataType="vm:AppRow" Header="Installed" Binding="{Binding Installed}" Width="95" />
+          <DataGridTextColumn x:DataType="vm:AppRow" Header="Last used" Binding="{Binding LastUsed}" SortMemberPath="LastUsedValue" Width="110" />
+          <DataGridTextColumn x:DataType="vm:AppRow" Header="Upgrade" Binding="{Binding Upgrade}" Width="160" />
+          <DataGridTextColumn x:DataType="vm:AppRow" Header="Source" Binding="{Binding Source}" Width="100" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+
+    <Border Grid.Row="2" Classes="panel">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+        <StackPanel Spacing="3">
+          <TextBlock Text="{Binding Summary}" Classes="caption" />
+          <TextBlock Text="{Binding ActionMessage}" TextWrapping="Wrap" FontSize="13"
+                     IsVisible="{Binding ActionMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"
+                    IsEnabled="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <Button Content="Open install folder" Command="{Binding RevealCommand}" />
+          <Button Content="Upgrade" Command="{Binding UpgradeCommand}" />
+          <Button Content="Uninstall" Command="{Binding UninstallCommand}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

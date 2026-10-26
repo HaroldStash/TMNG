@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tmng.App.ViewModels"
+             x:Class="Tmng.App.Views.SystemInfoView"
+             x:DataType="vm:SystemInfoViewModel">
+  <ScrollViewer>
+    <ItemsControl ItemsSource="{Binding Sections}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <UniformGrid Columns="2" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="vm:InfoSection">
+          <Border Classes="panel" Margin="0,0,10,10" VerticalAlignment="Top">
+            <StackPanel Spacing="8">
+              <TextBlock Text="{Binding Title}" Classes="title" />
+              <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:KeyValue">
+                    <Grid ColumnDefinitions="170,*" Margin="0,2">
+                      <TextBlock Text="{Binding Key}" Classes="caption" />
+                      <TextBlock Grid.Column="1" Text="{Binding Value}" Classes="mono" TextWrapping="Wrap" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </ScrollViewer>
+</UserControl>
