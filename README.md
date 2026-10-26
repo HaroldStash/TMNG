@@ -50,6 +50,27 @@ checked against the build on the Actions page, or you can build it yourself from
 TMNG asks for confirmation before any action that changes the system. It also offers several
 phosphor-style colour themes.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/summary.png" alt="Summary page with meters, CPU and memory history, and top processes"><br><sub><b>Summary</b>: live meters, history and the busiest processes</sub></td>
+    <td width="50%"><img src="docs/screenshots/performance.png" alt="Performance page with a graph for every logical processor"><br><sub><b>Performance</b>: every logical processor, disk and adapter</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/processes.png" alt="Processes page with apps grouped under expandable rows"><br><sub><b>Processes</b>: multi-process apps grouped with combined totals</sub></td>
+    <td><img src="docs/screenshots/process-details-dark.png" alt="Process details with launch chain, in the dark theme"><br><sub><b>Process details</b>: launch chain, identity and I/O (Dark theme)</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/thermals-dark.png" alt="Thermals view with per-sensor temperature graphs, in the dark theme"><br><sub><b>Thermals</b>: every temperature sensor with history (Dark theme)</sub></td>
+    <td><img src="docs/screenshots/power-and-freq.png" alt="Power and frequency page listing every sensor"><br><sub><b>Power &amp; Freq</b>: every sensor, with Windows energy meters per core</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/system-info.png" alt="System Info page with operating system, processor, memory and graphics"><br><sub><b>System Info</b>: OS, CPU topology, memory, GPUs and NPUs</sub></td>
+    <td></td>
+  </tr>
+</table>
+
 ## Requirements
 
 - 64-bit Windows 10 version 2004 (build 19041) or later, or Windows 11
