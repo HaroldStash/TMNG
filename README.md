@@ -11,6 +11,10 @@
 
 ---
 
+**TMNG (Task Manager Next Generation)** is a free, open-source system monitor and Task Manager alternative for
+Windows: CPU and GPU temperatures, fan speeds, per-app network and disk usage, grouped processes, alerts on any
+sensor, and a flight recorder that replays what your PC was doing. No subscription, no account, no telemetry.
+
 Every reading in TMNG carries an availability state: **Measured**, **Unavailable**, **Unsupported** or
 **AccessDenied**. A missing sensor shows `—`, `n/a` or `admin`, never a plausible-looking zero. A stalled
 sampler leaves a gap in the graphs rather than a smoothed line.
@@ -157,3 +161,8 @@ Only one TMNG runs per session. Launching it again brings the running one to the
 - [PawnIO](https://github.com/namazso/PawnIO) for register access when elevated
 - [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) for MVVM support
 - [Claude](https://claude.com/claude-code) by Anthropic for help writing and reviewing the code
+
+## License
+
+TMNG is free software under the [GNU General Public License v3.0](LICENSE). Use it, share it and change it freely;
+if you distribute a modified version, it has to stay open source under the same license.

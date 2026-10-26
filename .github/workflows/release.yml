@@ -1,6 +1,10 @@
 # Pushing a tag like v0.1.0 builds TMNG on a clean Windows machine and publishes
 # a GitHub release with the zip attached. A tag with a hyphen (v0.2.0-beta.1) is
 # published as a pre-release.
+#
+# Full releases are then submitted to winget as an update to HaroldStash.TMNG.
+# That step needs the WINGET_TOKEN secret (a classic token with public_repo scope)
+# and is skipped without it.
 name: Release
 
 on:
@@ -13,6 +17,9 @@ permissions:
 jobs:
   release:
     runs-on: windows-latest
+    env:
+      # Secrets cannot be tested in a step's `if`, so expose it here.
+      WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,3 +40,12 @@ jobs:
           $flags = @('--title', "TMNG $tag", '--generate-notes')
           if ($tag.Contains('-')) { $flags += '--prerelease' }
           gh release create $tag "publish/TMNG-$tag.zip" @flags
+
+      - name: Submit to winget
+        if: ${{ !contains(github.ref_name, '-') && env.WINGET_TOKEN != '' }}
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $url = "https://github.com/$env:GITHUB_REPOSITORY/releases/download/$tag/TMNG-$tag.zip"
+          Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+          ./wingetcreate.exe update HaroldStash.TMNG --version ($tag.TrimStart('v')) --urls $url --submit --token $env:WINGET_TOKEN

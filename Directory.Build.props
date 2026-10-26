@@ -5,6 +5,11 @@
     <LangVersion>latest</LangVersion>
     <!-- Release builds override this with the tag's version (build.ps1 -Version). -->
     <Version>0.1.0</Version>
+    <Product>TMNG (Task Manager Next Generation)</Product>
+    <Authors>HaroldStash</Authors>
+    <Company>HaroldStash</Company>
+    <Description>Free, open-source system monitor for Windows</Description>
+    <Copyright>Copyright © HaroldStash. Licensed under GPL-3.0.</Copyright>
     <!-- Compiled-in source paths (PDBs, CallerFilePath) read /_/ instead of this machine's folders. -->
     <PathMap>$(MSBuildThisFileDirectory)=/_/</PathMap>
   </PropertyGroup>
